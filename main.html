@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 쇼핑 분석기 - 메인</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 상단바 -->
+    <div class="top-bar">
+        <nav class="main-menu">
+            <ul>
+                <li class="dropdown">
+                    <a href="#" class="active">소싱 <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-content">
+                        <li><a href="#" onclick="switchTab('ai-sourcing')">AI 소싱</a></li>
+                        <li><a href="#" onclick="switchTab('reverse')">REVERSE</a></li>
+                        <li><a href="#" onclick="switchTab('shipping')">배송대행지</a></li>
+                        <li><a href="#" onclick="switchTab('customs')">통관번호</a></li>
+                        <li><a href="#" onclick="switchTab('exclude')">제외 LIST</a></li>
+                    </ul>
+                </li>
+                <li class="disabled">
+                    <a href="#" class="not-available">AI</a>
+                    <span class="tooltip">준비중입니다.</span>
+                </li>
+                <li class="disabled">
+                    <a href="#" class="not-available">마케팅</a>
+                    <span class="tooltip">준비중입니다.</span>
+                </li>
+                <li class="disabled">
+                    <a href="#" class="not-available">유튜브</a>
+                    <span class="tooltip">준비중입니다.</span>
+                </li>
+                <li class="disabled">
+                    <a href="#" class="not-available">멤버십</a>
+                    <span class="tooltip">준비중입니다.</span>
+                </li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <span id="remainingCredits"></span>
+            <a href="#" class="guide">가이드</a>
+            <button onclick="handleLogout()" class="logout-button">로그아웃</button>
+        </div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <ul>
+            <li onclick="switchTab('ai-sourcing')" data-tooltip="AI 소싱" class="active">
+                <i class="fas fa-robot"></i>
+                <span class="sidebar-text">AI 소싱</span>
+            </li>
+            <li onclick="switchTab('reverse')" data-tooltip="REVERSE">
+                <i class="fas fa-undo"></i>
+                <span class="sidebar-text">REVERSE</span>
+            </li>
+            <li onclick="switchTab('shipping')" data-tooltip="배송대행지">
+                <i class="fas fa-shipping-fast"></i>
+                <span class="sidebar-text">배송대행지</span>
+            </li>
+            <li onclick="switchTab('customs')" data-tooltip="통관번호">
+                <i class="fas fa-clipboard-check"></i>
+                <span class="sidebar-text">통관번호</span>
+            </li>
+            <li onclick="switchTab('exclude')" data-tooltip="제외 LIST">
+                <i class="fas fa-ban"></i>
+                <span class="sidebar-text">제외 LIST</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="container">
+        <!-- 탭 메뉴 -->
+        <div class="tab-menu">
+            <button class="tab-button active" onclick="switchTab('search')">
+                <i class="fas fa-search"></i> AI 소싱
+            </button>
+            <button class="tab-button" onclick="switchTab('collected')">
+                <i class="fas fa-box"></i> 수집한 상품
+            </button>
+            <button class="tab-button" onclick="switchTab('reverse')">
+                <i class="fas fa-sync"></i> 마켓 리버싱
+            </button>
+        </div>
+
+        <!-- AI 소싱 탭 -->
+        <div id="searchTab" class="tab-content active">
+            <div class="search-section">
+                <div class="search-container">
+                    <div class="search-type">
+                        <select id="searchType">
+                            <option value="review">리뷰많은순</option>
+                            <option value="rel">네이버랭킹순</option>
+                        </select>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
+                        <button onclick="handleSearch()" class="search-button">
+                            <i class="fas fa-search"></i> 검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-actions">
+                    <button onclick="handleCollectProducts()" class="collect-button" disabled>
+                        <i class="fas fa-download"></i> 선택된 상품 수집
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="40"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                                <th width="60">이미지</th>
+                                <th>상품명</th>
+                                <th width="100">가격</th>
+                                <th width="80">리뷰수</th>
+                                <th width="100">최근판매량</th>
+                                <th width="100">마켓명</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchResults"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 수집한 상품 탭 -->
+        <div id="collectedTab" class="tab-content">
+            <div class="collected-header">
+                <h2>수집된 상품 목록</h2>
+                <div class="progress-status">
+                    SEO 생성: <span id="seoProgress">0/0</span>
+                    타오바오 매칭: <span id="matchProgress">0/0</span>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="bulk-actions">
+                    <button onclick="handleBulkTaobaoMatch()" class="bulk-action-btn taobao-btn" disabled>
+                        <i class="fas fa-link"></i> 타오바오 매칭
+                    </button>
+                    <button onclick="handleDeleteProducts()" class="bulk-action-btn delete-btn" disabled>
+                        <i class="fas fa-trash"></i> 선택 삭제
+                    </button>
+                    <button onclick="handleDownloadHeySeller()" class="bulk-action-btn heyseller-btn" disabled>
+                        <i class="fas fa-file-download"></i> 헤이셀러 다운로드
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="40"><input type="checkbox" id="selectAllCollected" onclick="toggleSelectAllCollected()"></th>
+                                <th width="60">이미지</th>
+                                <th>상품명</th>
+                                <th width="200">SEO 타이틀</th>
+                                <th width="100">가격</th>
+                                <th width="80">리뷰수</th>
+                                <th width="100">최근판매량</th>
+                                <th width="100">마켓명</th>
+                                <th width="120">타오바오</th>
+                                <th width="120">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody id="collectedProducts"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 마켓 리버싱 탭 -->
+        <div id="reverseTab" class="tab-content">
+            <!-- 기존 마켓 리버싱 내용 유지 -->
+        </div>
+    </div>
+
+    <!-- 로딩 인디케이터 -->
+    <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>처리중입니다...</p>
+    </div>
+
+    <!-- 알림 모달 -->
+    <div id="messageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
